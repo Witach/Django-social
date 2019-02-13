@@ -1,12 +1,14 @@
+from django.conf import settings
 from django.db import models
-from django.config import settings
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
-from django.contrib.auth import get_user_model
-from django import template
+from accounts.models import User
+
 # Create your models hereself.
-User = get_user_model()
-register = template.Library()
+from django.contrib.auth import get_user_model
+#User = get_user_model()
+from django import template
+#register = template.Library()
 
 
 class Group(models.Model):
@@ -14,7 +16,7 @@ class Group(models.Model):
     slug = models.SlugField(allow_unicode=True, unique=True)
     description = models.TextField(blank=True, default='')
     desription_html=models.TextField(editable=False,blank=True, default='')
-    members =model.ManyToManyField(through="Membership")
+    members =models.ManyToManyField(User,through="Membership")
 
     def __str__(self):
         return self.name
@@ -22,7 +24,7 @@ class Group(models.Model):
     def save(self,*arg,**kwargs):
         self.slug = slugify(self.name)
         self.description_html = self.description
-        super().save(*args,**kwargs)
+        super().save(*arg,**kwargs)
 
     def get_absolute_url(self):
         return reverse("groups:single",kwargs={"slug":self.slug})
